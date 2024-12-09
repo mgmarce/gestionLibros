@@ -1,19 +1,13 @@
 <?php
-include_once('clases\EntidadBase.php');
-
-class Usuario extends EntidadBase {
-    private $nombre;
+abstract class Usuario {
+    protected $id;
+    protected $nombre;
 
     public function __construct($id, $nombre) {
         $this->id = $id;
         $this->nombre = $nombre;
     }
 
-    public function getNombre() {
-        return $this->nombre;
-    }
-
-    public function setNombre($nombre) {
-        $this->nombre = $nombre;
-    }
+    abstract public function getRol();
 }
+?>

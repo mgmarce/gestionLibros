@@ -1,0 +1,15 @@
+[
+    {
+        "id": 2,
+        "titulo": "La mascara de la muerte roja",
+        "autor": {
+            "id": 1,
+            "nombre": "Edgard Allan Poe"
+        },
+        "categoria": {
+            "id": 1,
+            "nombre": "Misterio"
+        },
+        "disponible": true
+    }
+]
