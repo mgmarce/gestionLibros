@@ -8,6 +8,14 @@ abstract class Usuario {
         $this->nombre = $nombre;
     }
 
+    public function getId() {
+        return $this->id; 
+    }
+
+    public function getNombre() {
+        return $this->nombre;
+    }
+
     abstract public function getRol();
 }
 ?>

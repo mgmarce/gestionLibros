@@ -1,14 +1,14 @@
 [
     {
-        "id": 2,
-        "titulo": "La mascara de la muerte roja",
+        "id": 1,
+        "titulo": "Weathering with You",
         "autor": {
-            "id": 1,
-            "nombre": "Edgard Allan Poe"
+            "id": 3,
+            "nombre": "Makoto Shinkai"
         },
         "categoria": {
-            "id": 1,
-            "nombre": "Misterio"
+            "id": 3,
+            "nombre": "Fantas\u00eda"
         },
         "disponible": true
     }

@@ -1,28 +1,50 @@
 <?php
+
 class Prestamo {
-    private $id;
     private $libro;
     private $lector;
     private $fechaPrestamo;
     private $fechaDevolucion;
 
-    public function __construct($id, Libro $libro, Lector $lector, $fechaPrestamo) {
-        $this->id = $id;
+    public function __construct(Libro $libro, Lector $lector) {
         $this->libro = $libro;
         $this->lector = $lector;
-        $this->fechaPrestamo = $fechaPrestamo;
-        $this->fechaDevolucion = null; // No hay fecha de devolución al inicio
+        $this->fechaPrestamo = date("Y-m-d H:i:s");
+        // La fecha de devolución será 7 días después del préstamo
+        $this->fechaDevolucion = date("Y-m-d H:i:s", strtotime("+7 days"));
     }
 
-    public function getId() { return $this->id; }
-    public function getLibro() { return $this->libro; }
-    public function getLector() { return $this->lector; }
-    public function getFechaPrestamo() { return $this->fechaPrestamo; }
-    public function getFechaDevolucion() { return $this->fechaDevolucion; }
-    
-    public function registrarDevolucion($fechaDevolucion) {
-        $this->fechaDevolucion = $fechaDevolucion;
+    public function getLibro() {
+        return $this->libro;
+    }
+
+    public function getLector() {
+        return $this->lector;
+    }
+
+    public function getFechaPrestamo() {
+        return $this->fechaPrestamo;
+    }
+
+    public function getFechaDevolucion() {
+        return $this->fechaDevolucion;
+    }
+
+    public function setFechaPrestamo($fecha) {
+        $this->fechaPrestamo = $fecha;
+    }
+
+    public function setFechaDevolucion($fecha) {
+        $this->fechaDevolucion = $fecha;
+    }
+
+    public function getDetallesPrestamo() {
+        return [
+            'libro' => $this->libro->getTitulo(),
+            'lector' => $this->lector->getNombre(),
+            'fechaPrestamo' => $this->fechaPrestamo,
+            'fechaDevolucion' => $this->fechaDevolucion,
+        ];
     }
 }
 ?>
-
