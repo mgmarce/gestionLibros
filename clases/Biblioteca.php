@@ -24,7 +24,7 @@ class Biblioteca {
                     $libro = new Libro($libroData['id'], $libroData['titulo'], $autor, $categoria);
 
                     if (!$libroData['disponible']) {
-                        $libro->prestar(); // Marcar como no disponible si aplica
+                        $libro->prestar(); // Marcar como prestado
                     }
 
                     $this->libros[$libro->getId()] = $libro;
@@ -145,19 +145,27 @@ class Biblioteca {
         file_put_contents($this->archivoPrestamos, json_encode($prestamosArray, JSON_PRETTY_PRINT));
     }
 
-    // Prestar libro a un lector
     public function prestarLibro(Libro $libro, Lector $lector) {
+    
         if ($libro->isDisponible()) {
-            $libro->prestar();  // Marcar libro como prestado
+            $libro->prestar(); // Marcar como prestado
             $prestamo = new Prestamo($libro, $lector);
-            $this->prestamos[] = $prestamo;  // Registrar el préstamo
-            $this->guardarLibrosEnJSON();  // Guardar el estado actualizado de los libros
-            $this->guardarPrestamosEnJSON(); // Guardar los préstamos actualizados
-            echo "Libro '{$libro->getTitulo()}' prestado a {$lector->getNombre()}.\n";
+            $this->prestamos[] = $prestamo;
+    
+            // Actualizar el libro en la lista y guardar en JSON
+            $this->libros[$libro->getId()] = $libro;
+            $this->guardarLibrosEnJSON();
+            $this->guardarPrestamosEnJSON();
+    
+            echo "Libro '{$libro->getTitulo()}' prestado correctamente.<br>";
         } else {
-            echo "El libro '{$libro->getTitulo()}' no está disponible para préstamo.\n";
+            echo "El libro '{$libro->getTitulo()}' ya está prestado.<br>";
         }
+    
     }
+    
+    
+    
 
     // Mostrar todos los préstamos
     public function mostrarPrestamos() {

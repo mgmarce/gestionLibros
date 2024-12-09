@@ -1,14 +1,66 @@
 [
     {
         "id": 1,
-        "titulo": "Weathering with You",
+        "titulo": "El cuervo",
         "autor": {
-            "id": 3,
-            "nombre": "Makoto Shinkai"
+            "id": 1,
+            "nombre": "Edgar Allan Poe"
         },
         "categoria": {
+            "id": 2,
+            "nombre": "Terror"
+        },
+        "disponible": true
+    },
+    {
+        "id": 2,
+        "titulo": "Crepusculo",
+        "autor": {
+            "id": 2,
+            "nombre": "Stephenie Meyer"
+        },
+        "categoria": {
+            "id": 1,
+            "nombre": "Romance"
+        },
+        "disponible": true
+    },
+    {
+        "id": 3,
+        "titulo": "El gato negro",
+        "autor": {
+            "id": 1,
+            "nombre": "Edgar Allan Poe"
+        },
+        "categoria": {
+            "id": 2,
+            "nombre": "Terror"
+        },
+        "disponible": true
+    },
+    {
+        "id": 4,
+        "titulo": "Mujercitas",
+        "autor": {
             "id": 3,
-            "nombre": "Fantas\u00eda"
+            "nombre": "Louisa May Alcott"
+        },
+        "categoria": {
+            "id": 1,
+            "nombre": "Romance"
+        },
+        "disponible": true
+    },
+    {
+        "id": 5,
+        "titulo": "Crepusculo - edici\u00f3n especial",
+        "autor": {
+            "id": 2,
+            "nombre": "Stephenie Meyer"
+        },
+        "categoria": {
+            "id": 1,
+            "nombre": "Romance"
         },
         "disponible": true
     }

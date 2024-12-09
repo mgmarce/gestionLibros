@@ -13,5 +13,7 @@ class Lector extends Usuario {
     public function solicitarPrestamo(Biblioteca $biblioteca, Libro $libro) {
         $biblioteca->prestarLibro($libro, $this);
     }
+
+    
 }
 ?>

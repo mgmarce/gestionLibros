@@ -54,5 +54,6 @@ class Libro {
     public function devolver() {
         $this->disponible = true;
     }
+    
 }
 ?>

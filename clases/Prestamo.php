@@ -9,9 +9,12 @@ class Prestamo {
     public function __construct(Libro $libro, Lector $lector) {
         $this->libro = $libro;
         $this->lector = $lector;
-        $this->fechaPrestamo = date("Y-m-d H:i:s");
-        // La fecha de devolución será 7 días después del préstamo
-        $this->fechaDevolucion = date("Y-m-d H:i:s", strtotime("+7 days"));
+
+        $fecha = new DateTime("now", new DateTimeZone("America/El_Salvador"));
+        $this->fechaPrestamo = $fecha->format('Y-m-d H:i:s');
+
+        $fecha->modify('+7 days');
+        $this->fechaDevolucion = $fecha->format('Y-m-d H:i:s');
     }
 
     public function getLibro() {
