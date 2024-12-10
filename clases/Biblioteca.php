@@ -58,17 +58,17 @@ class Biblioteca {
     public function agregarLibro(Libro $libro) {
         $this->libros[$libro->getId()] = $libro;
         $this->guardarLibrosEnJSON();
-        //echo "Libro '{$libro->getTitulo()}' agregado y guardado en JSON.\n";
+        //echo "Libro '{$libro->getTitulo()}' agregado y guardado en JSON.";
     }
 
     public function eliminarLibro($id) {
         if (isset($this->libros[$id])) {
             unset($this->libros[$id]);
             $this->guardarLibrosEnJSON();
-            echo "Libro con ID {$id} eliminado y JSON actualizado.\n";
+            echo "Libro con ID {$id} eliminado y JSON actualizado.<br>";
             return true;
         }
-        echo "Libro con ID {$id} no encontrado.\n";
+        echo "Libro con ID {$id} no encontrado.<br>";
         return false;
     }
 
@@ -87,7 +87,7 @@ class Biblioteca {
         }
     }
 
-    public function obtenerLibroPorId($id) {
+    private function obtenerLibroPorId($id) {
         foreach ($this->libros as $libro) {
             if ($libro->getId() == $id) {
                 return $libro;
@@ -96,38 +96,26 @@ class Biblioteca {
         return null;
     }
 
-
-    ///////////////////////////////////////////////////////////////////////
-
     // Mostrar libros disponibles
     public function mostrarLibros() {
         if (empty($this->libros)) {
-            echo "No hay libros.<br>";
+            echo "<strong>No hay libros.</strong><br>";
         } else {
+            echo "<table border='1'>";
+            echo "<tr><th>ID</th><th>Título</th><th>Autor</th><th>Categoría</th><th>Disponibilidad</th></tr>";
             foreach ($this->libros as $libro) {
-                echo "ID: {$libro->getId()} - Título: {$libro->getTitulo()} - Autor: {$libro->getAutor()->getNombre()} - Categoría: {$libro->getCategoria()->getNombre()} - " . ($libro->isDisponible() ? "Disponible" : "Prestado") . "<br>";
+                echo "<tr>";
+                echo "<td>{$libro->getId()}</td>";
+                echo "<td>{$libro->getTitulo()}</td>";
+                echo "<td>{$libro->getAutor()->getNombre()}</td>";
+                echo "<td>{$libro->getCategoria()->getNombre()}</td>";
+                echo "<td>" . ($libro->isDisponible() ? "Disponible" : "Prestado") . "</td>";
+                echo "</tr>";
             }
+            echo "</table>";
         }
     }
-
-    // Cargar préstamos desde el archivo JSON
-    private function cargarPrestamosDesdeJSON() {
-        if (file_exists($this->archivoPrestamos)) {
-            $datos = file_get_contents($this->archivoPrestamos);
-            $prestamosArray = json_decode($datos, true);
-
-            if ($prestamosArray) {
-                foreach ($prestamosArray as $prestamoData) {
-                    $libro = $this->libros[$prestamoData['libroId']];
-                    $lector = new Lector($prestamoData['lectorId'], $prestamoData['lectorNombre']);
-                    $prestamo = new Prestamo($libro, $lector);
-                    $prestamo->setFechaPrestamo($prestamoData['fechaPrestamo']);
-                    $prestamo->setFechaDevolucion($prestamoData['fechaDevolucion']);
-                    $this->prestamos[] = $prestamo;
-                }
-            }
-        }
-    }
+    
 
     // Guardar préstamos en el archivo JSON
     private function guardarPrestamosEnJSON() {
@@ -141,43 +129,57 @@ class Biblioteca {
                 'fechaDevolucion' => $prestamo->getFechaDevolucion(),
             ];
         }
-
         file_put_contents($this->archivoPrestamos, json_encode($prestamosArray, JSON_PRETTY_PRINT));
     }
 
     public function prestarLibro(Libro $libro, Lector $lector) {
     
-        if ($libro->isDisponible()) {
-            $libro->prestar(); // Marcar como prestado
-            $prestamo = new Prestamo($libro, $lector);
-            $this->prestamos[] = $prestamo;
-    
-            // Actualizar el libro en la lista y guardar en JSON
-            $this->libros[$libro->getId()] = $libro;
-            $this->guardarLibrosEnJSON();
-            $this->guardarPrestamosEnJSON();
-    
-            echo "Libro '{$libro->getTitulo()}' prestado correctamente.<br>";
-        } else {
+        if (!$this->verificarDisponibilidad($libro->getId())) {
             echo "El libro '{$libro->getTitulo()}' ya está prestado.<br>";
+            return false;
         }
+
+        $libro->prestar();
+        $prestamo = new Prestamo($libro, $lector);
+        $this->prestamos[] = $prestamo;
+    
+        $this->libros[$libro->getId()] = $libro;
+        $this->guardarLibrosEnJSON();
+        $this->guardarPrestamosEnJSON();
+    
+        echo "Libro '{$libro->getTitulo()}' prestado correctamente.<br>";
+        return true;
     
     }
-    
-    
-    
 
+    private function verificarDisponibilidad($idLibro) {
+        if (isset($this->libros[$idLibro])) {
+            return $this->libros[$idLibro]->isDisponible();
+        }
+        echo "El libro con ID {$idLibro} no existe en la biblioteca.<br>";
+        return false;
+    }
+    
     // Mostrar todos los préstamos
     public function mostrarPrestamos() {
-        if (empty($this->prestamos)) {
-            echo "No hay préstamos registrados.\n";
+        $prestamos = json_decode(file_get_contents($this->archivoPrestamos), true);
+        if (empty($prestamos)) {
+            echo "<strong>No hay préstamos registrados.</strong><br>";
         } else {
-            foreach ($this->prestamos as $prestamo) {
-                $detalles = $prestamo->getDetallesPrestamo();
-                echo "Libro: {$detalles['libro']} | Lector: {$detalles['lector']} | Fecha de Préstamo: {$detalles['fechaPrestamo']} | Fecha de Devolución: {$detalles['fechaDevolucion']}\n";
+            echo "<table border='1'>";
+            echo "<tr><th>ID Libro</th><th>Lector</th><th>Fecha de Préstamo</th><th>Fecha de Devolución</th></tr>";
+            foreach ($prestamos as $prestamo) {
+                echo "<tr>";
+                echo "<td>{$prestamo['libroId']}</td>";
+                echo "<td>{$prestamo['lectorNombre']}</td>";
+                echo "<td>{$prestamo['fechaPrestamo']}</td>";
+                echo "<td>{$prestamo['fechaDevolucion']}</td>";
+                echo "</tr>";
             }
+            echo "</table>";
         }
     }
+    
 
     public function buscarLibroPorAutor($autorNombre) {
         $resultados = [];
@@ -186,8 +188,26 @@ class Biblioteca {
                 $resultados[] = $libro;
             }
         }
-        return $resultados;
+    
+        if (empty($resultados)) {
+            echo "<strong>No se encontraron libros de autor '{$autorNombre}'.</strong><br>";
+        } else {
+            echo "<strong><br>Libros por el autor: ".$autorNombre."</strong>";
+            echo "<table border='1'>";
+            echo "<tr><th>ID</th><th>Título</th><th>Autor</th><th>Categoría</th><th>Disponibilidad</th></tr>";
+            foreach ($resultados as $libro) {
+                echo "<tr>";
+                echo "<td>{$libro->getId()}</td>";
+                echo "<td>{$libro->getTitulo()}</td>";
+                echo "<td>{$libro->getAutor()->getNombre()}</td>";
+                echo "<td>{$libro->getCategoria()->getNombre()}</td>";
+                echo "<td>" . ($libro->isDisponible() ? "Disponible" : "Prestado") . "</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+        }
     }
+    
 
     public function buscarLibroPorCategoria($categoriaNombre) {
         $resultados = [];
@@ -196,7 +216,24 @@ class Biblioteca {
                 $resultados[] = $libro;
             }
         }
-        return $resultados;
+    
+        if (empty($resultados)) {
+            echo "<strong>No se encontraron libros de autor '{$categoriaNombre}'.</strong><br>";
+        } else {
+            echo "<strong><br>Libros de la categoria: ".$categoriaNombre."</strong>";
+            echo "<table border='1'>";
+            echo "<tr><th>ID</th><th>Título</th><th>Autor</th><th>Categoría</th><th>Disponibilidad</th></tr>";
+            foreach ($resultados as $libro) {
+                echo "<tr>";
+                echo "<td>{$libro->getId()}</td>";
+                echo "<td>{$libro->getTitulo()}</td>";
+                echo "<td>{$libro->getAutor()->getNombre()}</td>";
+                echo "<td>{$libro->getCategoria()->getNombre()}</td>";
+                echo "<td>" . ($libro->isDisponible() ? "Disponible" : "Prestado") . "</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+        }
     }
 
     public function buscarLibroPorTitulo($titulo) {
@@ -206,22 +243,85 @@ class Biblioteca {
                 $resultados[] = $libro;
             }
         }
-        return $resultados;
+    
+        if (empty($resultados)) {
+            echo "<strong>No se encontraron libros de autor '{$titulo}'.</strong><br>";
+        } else {
+            echo "<strong><br>Libros por el titulo: ".$titulo."</strong>";
+            echo "<table border='1'>";
+            echo "<tr><th>ID</th><th>Título</th><th>Autor</th><th>Categoría</th><th>Disponibilidad</th></tr>";
+            foreach ($resultados as $libro) {
+                echo "<tr>";
+                echo "<td>{$libro->getId()}</td>";
+                echo "<td>{$libro->getTitulo()}</td>";
+                echo "<td>{$libro->getAutor()->getNombre()}</td>";
+                echo "<td>{$libro->getCategoria()->getNombre()}</td>";
+                echo "<td>" . ($libro->isDisponible() ? "Disponible" : "Prestado") . "</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+        }
+    }
+
+    private function cargarPrestamosDesdeJSON() {
+        if (file_exists($this->archivoPrestamos)) {
+            $datos = file_get_contents($this->archivoPrestamos);
+            $prestamosArray = json_decode($datos, true);
+    
+            if ($prestamosArray) {
+                foreach ($prestamosArray as $prestamoData) {
+                    $libro = $this->libros[$prestamoData['libroId']];
+                    $lector = new Lector($prestamoData['lectorId'], $prestamoData['lectorNombre']);
+                    $prestamo = new Prestamo($libro, $lector);
+                    $prestamo->setFechaPrestamo($prestamoData['fechaPrestamo']);
+                    $prestamo->setFechaDevolucion($prestamoData['fechaDevolucion']);
+                    $this->prestamos[] = $prestamo;
+                }
+            }
+        }
     }
 
     public function librosPrestadosPorLector(Lector $lector) {
+        // Cargar los préstamos desde el archivo JSON
+        $prestamos = json_decode(file_get_contents($this->archivoPrestamos), true);
         $librosPrestados = [];
-        foreach ($this->prestamos as $prestamo) {
-            if ($prestamo->getLector()->getId() == $lector->getId()) {
-                $librosPrestados[] = [
-                    'titulo' => $prestamo->getLibro()->getTitulo(),
-                    'fechaPrestamo' => $prestamo->getFechaPrestamo(),
-                    'fechaDevolucion' => $prestamo->getFechaDevolucion() ? $prestamo->getFechaDevolucion() : 'No devuelto aún'
-                ];
+        if (!empty($prestamos)) {
+            foreach ($prestamos as $prestamoData) {
+                $libro = $this->obtenerLibroPorId($prestamoData['libroId']);
+                if ($prestamoData['lectorId'] == $lector->getId()) {
+                    // Crear un arreglo con los datos del préstamo
+                    $librosPrestados[] = [
+                        'titulo' => $libro->getTitulo(),
+                        'fechaPrestamo' => $prestamoData['fechaPrestamo'],
+                        'fechaDevolucion' => isset($prestamoData['fechaDevolucion']) ? $prestamoData['fechaDevolucion'] : 'No devuelto aún'
+                    ];
+                }
             }
         }
+    
+        // Si no se encontraron libros prestados
+        if (empty($librosPrestados)) {
+            echo "No hay libros prestados por el lector '{$lector->getNombre()}'.<br>";
+        } else {
+            // Mostrar en formato tabla
+            echo "<strong><br>Libros prestados por el lector '{$lector->getNombre()}'.</strong><br>";
+            echo "<table border='1'>";
+            echo "<tr><th>Título</th><th>Fecha de Préstamo</th><th>Fecha de Devolución</th></tr>";
+            foreach ($librosPrestados as $libro) {
+                echo "<tr>";
+                echo "<td>{$libro['titulo']}</td>";
+                echo "<td>{$libro['fechaPrestamo']}</td>";
+                echo "<td>{$libro['fechaDevolucion']}</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+        }
+    
         return $librosPrestados;
     }
+    
+    
+    
     
 }
 ?>

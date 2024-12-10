@@ -24,12 +24,17 @@ class Administrador extends Usuario implements CRUD {
     public function editar($id, $item) {  
         if ($item instanceof Libro) {
             $this->biblioteca->editarLibro($id, $item->getTitulo(), $item->getAutor(), $item->getCategoria());
-            //echo "Libro con ID {$id} ha sido editado por el administrador.<br>";
         } else {
             echo "El item no es un libro válido para editar.<br>";
         }
     }
 
+    public function listar() {  
+        //LISTA TODOS LOS PRESTAMOS REALIZADOS POR TODOS LOS LECTORES
+        $this->biblioteca->mostrarPrestamos();
+    }
+
+    
 
 }
 ?>

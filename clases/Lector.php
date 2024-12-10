@@ -14,6 +14,5 @@ class Lector extends Usuario {
         $biblioteca->prestarLibro($libro, $this);
     }
 
-    
 }
 ?>

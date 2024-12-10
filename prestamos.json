@@ -1,0 +1,9 @@
+[
+    {
+        "libroId": 4,
+        "lectorId": 1,
+        "lectorNombre": "Marcela Menjivar",
+        "fechaPrestamo": "2024-12-10 01:37:14",
+        "fechaDevolucion": "2024-12-17 01:37:14"
+    }
+]
